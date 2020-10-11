@@ -6,7 +6,7 @@ It is a collection of text animations inspired by [LTMorphingLabel](https://gith
 
 ### ScaleMorphingText
 
-<img src="https://github.com/SirusCodes/morphing_text/blob/master/display/scale.gif?raw=true" align=right>
+<img src="https://github.com/SirusCodes/morphing_text/blob/master/display/scale.gif?raw=true" height=200px>
 
 ```dart
 ScaleMorphingText(
@@ -34,7 +34,6 @@ ScaleMorphingText(
 
 > Changing Curves is purely experimental, select proper curves as per your need or leave them at default
 
-
 ## Installation
 Add in your pubspec.yaml
 ```yaml
@@ -51,3 +50,6 @@ Then import it in your main
 ```dart
 import 'package: morphing_text/morphing_text.dart';
 ```
+
+## Want to Contribute?
+A help is always welcomed, check our [CONTRIBUTING.md](https://github.com/SirusCodes/morphing_text/blob/master/CONTRIBUTING.md)
