@@ -6,7 +6,7 @@ It is a collection of text animations inspired by [LTMorphingLabel](https://gith
 
 ### ScaleMorphingText
 
-<img src="../display/scale.gif" align=right>
+<img src="https://github.com/SirusCodes/morphing_text/blob/master/display/scale.gif?raw=true" align=right>
 
 ```dart
 ScaleMorphingText(
