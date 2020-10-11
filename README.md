@@ -1,3 +1,6 @@
+![](https://img.shields.io/github/license/SirusCodes/morphing_text) ![](https://img.shields.io/pub/v/morphing_text)
+![](https://img.shields.io/github/issues/SirusCodes/morphing_text) ![](https://img.shields.io/github/stars/SirusCodes/morphing_text)
+
 # Morphing Text
 
 It is a collection of text animations inspired by [LTMorphingLabel](https://github.com/lexrus/LTMorphingLabel). 
