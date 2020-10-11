@@ -39,7 +39,7 @@ ScaleMorphingText(
 Add in your pubspec.yaml
 ```yaml
 dependencies:
-	 morphing_text: <latest>
+  morphing_text: <latest>
 ```
 
 install packages
