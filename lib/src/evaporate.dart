@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class EvaporateMorphingText extends StatefulWidget {
@@ -87,7 +89,9 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
   Animation<double> _fadeIn, _fadeOut, _progress;
 
   List<String> texts;
-  int index = 0, length, count;
+  int index = -1, length, count;
+
+  Timer _timer;
 
   @override
   void initState() {
@@ -102,7 +106,8 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
       CurvedAnimation(parent: _controller, curve: widget.fadeOutCurve),
     );
     _progress =
-        CurvedAnimation(parent: _controller, curve: widget.progressCurve);
+        CurvedAnimation(parent: _controller, curve: widget.progressCurve)
+          ..addStatusListener(_statusListener);
 
     // getting data from parent class
     texts = widget.texts;
@@ -117,6 +122,8 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
 
   @override
   void dispose() {
+    _timer?.cancel();
+    _controller?.stop();
     _controller?.dispose();
     super.dispose();
   }
@@ -130,7 +137,6 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
           child: CustomPaint(
             painter: _WTextPainter(
               text: texts[index],
-              preText: texts[(index + length - 1) % length],
               textStyle:
                   DefaultTextStyle.of(context).style.merge(widget.textStyle),
               fadeInProgress: _fadeIn.value,
@@ -144,7 +150,14 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
     );
   }
 
-  Future<void> _nextText() async {
+  void _statusListener(AnimationStatus status) {
+    if (AnimationStatus.completed == status) {
+      // Pause before starting an animation and then call _nextText
+      _timer = Timer(widget.pause, _nextText);
+    }
+  }
+
+  void _nextText() {
     final bool isLast = index % length == length - 1;
 
     // loopForever is [false] and  we are a last index
@@ -159,44 +172,37 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
       }
     }
 
-    // Pause before starting an animation
-    await Future.delayed(widget.pause);
-
     // incremented index or set to [0]
-    setState(() {
-      index = isLast ? 0 : index + 1;
-    });
+    index = isLast ? 0 : index + 1;
 
-    // restarting the controller from [0] and waiting it to complete
-    await _controller.forward(from: 0);
+    if (mounted) setState(() {});
 
-    // recursively calling the function
-    _nextText();
+    _controller.forward(from: 0);
   }
 }
 
 class _WTextPainter extends CustomPainter {
   _WTextPainter({
     this.text,
-    this.preText,
     this.textStyle,
     this.fadeInProgress,
     this.fadeOutProgress,
     this.progress,
     this.yDisplace,
   })  : assert(text != null),
-        assert(preText != null),
         assert(fadeInProgress != null),
         assert(fadeOutProgress != null),
         assert(textStyle != null);
 
   final String text;
-  final String preText;
+
   final TextStyle textStyle;
   final double fadeInProgress, fadeOutProgress, progress, yDisplace;
 
   List<_TextInfo> _textInfo = [];
   List<_TextInfo> _oldTextInfo = [];
+
+  String _oldText;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -263,16 +269,23 @@ class _WTextPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_WTextPainter oldDelegate) {
-    // shouldn't repaint if there is not change in progress
-    if (this.progress == oldDelegate.progress) {
-      return false;
+    String oldFrameText = oldDelegate.text;
+    if (oldFrameText == text) {
+      this._oldText = oldDelegate._oldText;
+      this._oldTextInfo = oldDelegate._oldTextInfo;
+      this._textInfo = oldDelegate._textInfo;
+      // shouldn't repaint if there is not change in progress
+      if (this.progress == oldDelegate.progress) {
+        return false;
+      }
+    } else {
+      this._oldText = oldDelegate.text;
+      // calculate text info for prev and current text
+      calculateTextInfo(text, _textInfo);
+      calculateTextInfo(_oldText, _oldTextInfo);
+      // calculate which text will move to which position
+      calculateMove();
     }
-
-    // calculate text info for prev and current text
-    calculateTextInfo(text, _textInfo);
-    calculateTextInfo(preText, _oldTextInfo);
-    // calculate which text will move to which position
-    calculateMove();
     return true;
   }
 
