@@ -1,3 +1,7 @@
+## [0.2.1+1] - Documentation updated
+
+- Documentation updated
+
 ## [0.2.1] - Evaporate animation and bug fixes
 
 - Added EvaporateMorphingText

@@ -38,12 +38,12 @@ class EvaporateMorphingText extends StatefulWidget {
 
   /// Curve which controls opacity from 0 to 1
   ///
-  /// Default is [Curves.easeInExpo]
+  /// Default is [Curves.easeInCubic]
   final Curve fadeInCurve;
 
   /// Curve which controls opacity from 1 to 0
   ///
-  /// Default is [Curves.easeOut]
+  /// Default is [Curves.easeInCubic]
   final Curve fadeOutCurve;
 
   /// Curve which controls movement of text and scale changes
