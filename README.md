@@ -1,17 +1,17 @@
 <div>
-   <a href="">
+   <a href="https://github.com/SirusCodes/morphing_text/blob/master/LICENSE">
    <img src="https://img.shields.io/github/license/SirusCodes/morphing_text" >
    </a>
 
-   <a href="">
+   <a href="https://pub.dev/packages/morphing_text">
    <img src="https://img.shields.io/pub/v/morphing_text" >
    </a>
 
-   <a href="">
+   <a href="https://github.com/SirusCodes/morphing_text/issues">
    <img src="https://img.shields.io/github/issues/SirusCodes/morphing_text" >
    </a>
 
-   <a href="">
+   <a href="https://github.com/SirusCodes/morphing_text">
    <img src="https://img.shields.io/github/stars/SirusCodes/morphing_text" >
    </a>
 </div> 
