@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-class ScaleMorphingText extends StatefulWidget {
+class EvaporateMorphingText extends StatefulWidget {
   /// List of [String] which will show the texts
   final List<String> texts;
 
@@ -51,7 +51,12 @@ class ScaleMorphingText extends StatefulWidget {
   /// Default is [Curves.easeIn]
   final Curve progressCurve;
 
-  const ScaleMorphingText({
+  /// This will give the displacement factor of y-axis of the text
+  ///
+  /// Default is [1.0]
+  final double yDisplacement;
+
+  const EvaporateMorphingText({
     Key key,
     @required this.texts,
     this.textStyle,
@@ -60,9 +65,10 @@ class ScaleMorphingText extends StatefulWidget {
     this.loopForever = false,
     this.loopCount = 1,
     this.onComplete,
-    this.fadeInCurve = Curves.easeInExpo,
-    this.fadeOutCurve = Curves.easeOut,
+    this.fadeInCurve = Curves.easeInCubic,
+    this.fadeOutCurve = Curves.easeInCubic,
     this.progressCurve = Curves.easeIn,
+    this.yDisplacement = 1.0,
   })  : assert(texts != null, "'texts' cannot be null"),
         assert(speed != null, "'speed' cannot be null"),
         assert(pause != null, "'pause' cannot be null"),
@@ -74,10 +80,10 @@ class ScaleMorphingText extends StatefulWidget {
         super(key: key);
 
   @override
-  _ScaleMorphingTextState createState() => _ScaleMorphingTextState();
+  _EvaporateMorphingTextState createState() => _EvaporateMorphingTextState();
 }
 
-class _ScaleMorphingTextState extends State<ScaleMorphingText>
+class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   Animation<double> _fadeIn, _fadeOut, _progress;
@@ -99,10 +105,9 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
     _fadeOut = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _controller, curve: widget.fadeOutCurve),
     );
-    _progress = CurvedAnimation(
-      parent: _controller,
-      curve: widget.progressCurve,
-    )..addStatusListener(_statusListener);
+    _progress =
+        CurvedAnimation(parent: _controller, curve: widget.progressCurve)
+          ..addStatusListener(_statusListener);
 
     // getting data from parent class
     texts = widget.texts;
@@ -137,6 +142,7 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
               fadeInProgress: _fadeIn.value,
               fadeOutProgress: _fadeOut.value,
               progress: _progress.value,
+              yDisplace: widget.yDisplacement,
             ),
           ),
         );
@@ -151,7 +157,7 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
     }
   }
 
-  Future<void> _nextText() async {
+  void _nextText() {
     final bool isLast = index % length == length - 1;
 
     // loopForever is [false] and  we are a last index
@@ -171,7 +177,6 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
 
     if (mounted) setState(() {});
 
-    // restarting the controller from [0]
     _controller.forward(from: 0);
   }
 }
@@ -183,6 +188,7 @@ class _WTextPainter extends CustomPainter {
     this.fadeInProgress,
     this.fadeOutProgress,
     this.progress,
+    this.yDisplace,
   })  : assert(text != null),
         assert(fadeInProgress != null),
         assert(fadeOutProgress != null),
@@ -191,7 +197,7 @@ class _WTextPainter extends CustomPainter {
   final String text;
 
   final TextStyle textStyle;
-  final double fadeInProgress, fadeOutProgress, progress;
+  final double fadeInProgress, fadeOutProgress, progress, yDisplace;
 
   List<_TextInfo> _textInfo = [];
   List<_TextInfo> _oldTextInfo = [];
@@ -201,7 +207,6 @@ class _WTextPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     double percent = progress;
-    double fadeIn = fadeInProgress;
     // calculate text info for 1st time
     if (_textInfo.length == 0) {
       calculateTextInfo(text, _textInfo);
@@ -217,7 +222,7 @@ class _WTextPainter extends CustomPainter {
           drawText(
             canvas,
             _oldTextLayoutInfo.text,
-            1,
+            0,
             1,
             Offset(
               _oldTextLayoutInfo.offsetX - changeInX,
@@ -229,9 +234,12 @@ class _WTextPainter extends CustomPainter {
           drawText(
             canvas,
             _oldTextLayoutInfo.text,
-            1 - percent,
+            -percent,
             fadeOutProgress,
-            Offset(_oldTextLayoutInfo.offsetX, _oldTextLayoutInfo.offsetY),
+            Offset(
+              _oldTextLayoutInfo.offsetX,
+              _oldTextLayoutInfo.offsetY,
+            ),
             _oldTextLayoutInfo,
           );
         }
@@ -239,16 +247,18 @@ class _WTextPainter extends CustomPainter {
     } else {
       //no oldText
       percent = 1;
-      fadeIn = 1;
     }
     for (_TextInfo _textLayoutInfo in _textInfo) {
       if (!_textLayoutInfo.isMoving) {
         drawText(
           canvas,
           _textLayoutInfo.text,
-          percent,
-          fadeIn,
-          Offset(_textLayoutInfo.offsetX, _textLayoutInfo.offsetY),
+          1 - percent,
+          fadeInProgress,
+          Offset(
+            _textLayoutInfo.offsetX,
+            _textLayoutInfo.offsetY,
+          ),
           _textLayoutInfo,
         );
       }
@@ -282,7 +292,7 @@ class _WTextPainter extends CustomPainter {
   void drawText(
     Canvas canvas,
     String text,
-    double textScaleFactor,
+    double yOffset,
     double alphaFactor,
     Offset offset,
     _TextInfo textInfo,
@@ -307,13 +317,17 @@ class _WTextPainter extends CustomPainter {
     )
       ..textDirection = TextDirection.ltr
       ..textAlign = TextAlign.center
-      ..textScaleFactor = textScaleFactor
       ..textDirection = TextDirection.ltr
       ..layout();
 
+    final yMove = yDisplace * textInfo.height * yOffset;
+
     textPainter.paint(
       canvas,
-      Offset(offset.dx, offset.dy + (textInfo.height - textPainter.height) / 2),
+      Offset(
+        offset.dx,
+        (offset.dy + (textInfo.height - textPainter.height) / 2) + yMove,
+      ),
     );
   }
 

@@ -27,7 +27,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<String> text = [
+  static const List<String> text = [
     "Design",
     "Design is not just",
     "what it looks like",
@@ -37,18 +37,40 @@ class _MyHomePageState extends State<MyHomePage> {
     "- Steve Jobs",
   ];
 
+  List<Widget> animations = [
+    ScaleMorphingText(
+      texts: text,
+      loopForever: true,
+      onComplete: () {
+        print("Completed");
+      },
+      textStyle: TextStyle(fontSize: 50.0),
+    ),
+    EvaporateMorphingText(
+      texts: text,
+      loopForever: true,
+      onComplete: () {
+        print("Completed");
+      },
+      textStyle: TextStyle(fontSize: 50.0),
+    ),
+  ];
+
+  int index = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: ScaleMorphingText(
-          texts: text,
-          loopForever: true,
-          onComplete: () {
-            print("Completed");
-          },
-          textStyle: TextStyle(fontSize: 40.0),
-        ),
+        child: animations[index % animations.length],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            index++;
+          });
+        },
+        child: Icon(Icons.arrow_forward_ios),
       ),
     );
   }
