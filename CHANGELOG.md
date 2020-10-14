@@ -1,3 +1,9 @@
+## [0.2.1] - Evaporate animation and bug fixes
+
+- Added EvaporateMorphingText
+- Using `Timer` instead of `Future.delayed()` for pause
+
+
 ## [0.1.0+1] - README and pub update
 
 - README and pub update

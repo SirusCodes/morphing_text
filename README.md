@@ -1,5 +1,20 @@
-![](https://img.shields.io/github/license/SirusCodes/morphing_text) ![](https://img.shields.io/pub/v/morphing_text)
-![](https://img.shields.io/github/issues/SirusCodes/morphing_text) ![](https://img.shields.io/github/stars/SirusCodes/morphing_text)
+<div>
+   <a href="">
+   <img src="https://img.shields.io/github/license/SirusCodes/morphing_text" >
+   </a>
+
+   <a href="">
+   <img src="https://img.shields.io/pub/v/morphing_text" >
+   </a>
+
+   <a href="">
+   <img src="https://img.shields.io/github/issues/SirusCodes/morphing_text" >
+   </a>
+
+   <a href="">
+   <img src="https://img.shields.io/github/stars/SirusCodes/morphing_text" >
+   </a>
+</div> 
 
 # Morphing Text
 
@@ -16,7 +31,21 @@ ScaleMorphingText(
     texts: text,
     loopForever: true,
     onComplete: () {},
-    textStyle: TextStyle(color: Colors.black, fontSize: 40.0),
+    textStyle: TextStyle(fontSize: 40.0),
+),
+```
+
+### EvaporateMorphingText
+
+<img src="https://github.com/SirusCodes/morphing_text/blob/master/display/evaporate.gif?raw=true" height=200px>
+
+```dart
+EvaporateMorphingText(
+    texts: text,
+    loopForever: true,
+    onComplete: () {},
+    yDisplacement: 1.2,     // To factor of y-displacement
+    textStyle: TextStyle(fontSize: 40.0),
 ),
 ```
 
