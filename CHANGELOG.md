@@ -1,3 +1,7 @@
+## [1.0.0-nullsafety.0] - Null Safety added
+
+- Null Safety added
+
 ## [0.2.1+1] - Documentation updated
 
 - Documentation updated

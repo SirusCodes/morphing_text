@@ -9,7 +9,7 @@ class ScaleMorphingText extends StatefulWidget {
   /// Gives [TextStyle] to the text
   ///
   /// Default is [DefaultTextStyle]
-  final TextStyle textStyle;
+  final TextStyle? textStyle;
 
   /// Speed of changing text
   ///
@@ -34,7 +34,7 @@ class ScaleMorphingText extends StatefulWidget {
   final int loopCount;
 
   /// Called after [loopCount] is completed
-  final VoidCallback onComplete;
+  final VoidCallback? onComplete;
 
   /// Curve which controls opacity from 0 to 1
   ///
@@ -52,8 +52,8 @@ class ScaleMorphingText extends StatefulWidget {
   final Curve progressCurve;
 
   const ScaleMorphingText({
-    Key key,
-    @required this.texts,
+    Key? key,
+    /*required*/ required this.texts,
     this.textStyle,
     this.speed = const Duration(milliseconds: 500),
     this.pause = const Duration(seconds: 1, milliseconds: 500),
@@ -63,11 +63,7 @@ class ScaleMorphingText extends StatefulWidget {
     this.fadeInCurve = Curves.easeInExpo,
     this.fadeOutCurve = Curves.easeOut,
     this.progressCurve = Curves.easeIn,
-  })  : assert(texts != null, "'texts' cannot be null"),
-        assert(speed != null, "'speed' cannot be null"),
-        assert(pause != null, "'pause' cannot be null"),
-        assert(loopForever != null, "'loopForever' cannot be null"),
-        assert(
+  })  : assert(
           loopCount > 0,
           "'loopCount' should have value greater than 0",
         ),
@@ -79,13 +75,14 @@ class ScaleMorphingText extends StatefulWidget {
 
 class _ScaleMorphingTextState extends State<ScaleMorphingText>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _fadeIn, _fadeOut, _progress;
+  late AnimationController _controller;
+  late Animation<double> _fadeIn, _fadeOut, _progress;
 
-  List<String> texts;
-  int index = -1, length, count;
+  late List<String> texts;
+  int index = -1;
+  late int length, count;
 
-  Timer _timer;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -118,8 +115,8 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
   @override
   void dispose() {
     _timer?.cancel();
-    _controller?.stop();
-    _controller?.dispose();
+    _controller.stop();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -127,7 +124,7 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _controller,
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return RepaintBoundary(
           child: CustomPaint(
             painter: _WTextPainter(
@@ -178,25 +175,22 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
 
 class _WTextPainter extends CustomPainter {
   _WTextPainter({
-    this.text,
-    this.textStyle,
-    this.fadeInProgress,
-    this.fadeOutProgress,
-    this.progress,
-  })  : assert(text != null),
-        assert(fadeInProgress != null),
-        assert(fadeOutProgress != null),
-        assert(textStyle != null);
+    required this.text,
+    required this.textStyle,
+    required this.fadeInProgress,
+    required this.fadeOutProgress,
+    required this.progress,
+  });
 
   final String text;
 
   final TextStyle textStyle;
-  final double fadeInProgress, fadeOutProgress, progress;
+  final double /*!*/ fadeInProgress, fadeOutProgress, progress;
 
   List<_TextInfo> _textInfo = [];
   List<_TextInfo> _oldTextInfo = [];
 
-  String _oldText;
+  String? _oldText;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -209,7 +203,7 @@ class _WTextPainter extends CustomPainter {
 
     canvas.save();
 
-    if (_oldTextInfo != null && _oldTextInfo.length > 0) {
+    if (_oldTextInfo.length > 0) {
       for (_TextInfo _oldTextLayoutInfo in _oldTextInfo) {
         if (_oldTextLayoutInfo.isMoving) {
           final changeInX =
@@ -272,7 +266,7 @@ class _WTextPainter extends CustomPainter {
       this._oldText = oldDelegate.text;
       // calculate text info for prev and current text
       calculateTextInfo(text, _textInfo);
-      calculateTextInfo(_oldText, _oldTextInfo);
+      calculateTextInfo(_oldText!, _oldTextInfo);
       // calculate which text will move to which position
       calculateMove();
     }
@@ -289,10 +283,10 @@ class _WTextPainter extends CustomPainter {
   ) {
     final textPaint = Paint();
     if (alphaFactor == 1) {
-      textPaint.color = textStyle.color;
+      textPaint.color = textStyle.color!;
     } else {
-      textPaint.color = textStyle.color.withAlpha(
-        (textStyle.color.alpha * alphaFactor).floor(),
+      textPaint.color = textStyle.color!.withAlpha(
+        (textStyle.color!.alpha * alphaFactor).floor(),
       );
     }
 
@@ -332,22 +326,23 @@ class _WTextPainter extends CustomPainter {
       var forCaret =
           textPainter.getOffsetForCaret(TextPosition(offset: i), Rect.zero);
 
-      var textLayoutInfo = _TextInfo()
-        ..text = text[i]
-        ..offsetX = forCaret.dx - textPainter.width / 2
-        ..offsetY = forCaret.dy
-        ..width = 0
-        ..height = textPainter.height;
+      var textLayoutInfo = _TextInfo(
+        text: text[i],
+        offsetX: forCaret.dx - textPainter.width / 2,
+        offsetY: forCaret.dy,
+        width: 0,
+        height: textPainter.height,
+      );
 
       list.add(textLayoutInfo);
     }
   }
 
   void calculateMove() {
-    if (_oldTextInfo == null || _oldTextInfo.length == 0) {
+    if (_oldTextInfo.length == 0) {
       return;
     }
-    if (_textInfo == null || _textInfo.length == 0) {
+    if (_textInfo.length == 0) {
       return;
     }
 
@@ -371,4 +366,12 @@ class _TextInfo {
   double height;
   double toX = 0;
   bool isMoving = false;
+
+  _TextInfo({
+    required this.text,
+    required this.offsetX,
+    required this.offsetY,
+    required this.width,
+    required this.height,
+  });
 }

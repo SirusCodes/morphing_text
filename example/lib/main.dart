@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+  MyHomePage({Key? key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
       onComplete: () {
         print("Completed");
       },
-      textStyle: TextStyle(fontSize: 50.0),
+      textStyle: TextStyle(fontSize: 30.0),
     ),
     EvaporateMorphingText(
       texts: text,
@@ -52,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
       onComplete: () {
         print("Completed");
       },
-      textStyle: TextStyle(fontSize: 50.0),
+      textStyle: TextStyle(fontSize: 30.0),
     ),
   ];
 
