@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'core/custom_morphing_painter.dart';
+
 class EvaporateMorphingText extends StatefulWidget {
   /// List of [String] which will show the texts
   final List<String> texts;
@@ -133,17 +135,15 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
     return AnimatedBuilder(
       animation: _controller,
       builder: (BuildContext context, Widget child) {
-        return RepaintBoundary(
-          child: CustomPaint(
-            painter: _WTextPainter(
-              text: texts[index],
-              textStyle:
-                  DefaultTextStyle.of(context).style.merge(widget.textStyle),
-              fadeInProgress: _fadeIn.value,
-              fadeOutProgress: _fadeOut.value,
-              progress: _progress.value,
-              yDisplace: widget.yDisplacement,
-            ),
+        return CustomMorphingText(
+          morphingText: Evaporate(
+            text: texts[index],
+            textStyle:
+                DefaultTextStyle.of(context).style.merge(widget.textStyle),
+            fadeInProgress: _fadeIn.value,
+            fadeOutProgress: _fadeOut.value,
+            progress: _progress.value,
+            yDisplace: widget.yDisplacement,
           ),
         );
       },
@@ -181,208 +181,31 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
   }
 }
 
-class _WTextPainter extends CustomPainter {
-  _WTextPainter({
-    this.text,
-    this.textStyle,
+class Evaporate extends CustomMorphingPainter {
+  Evaporate({
+    String text,
+    TextStyle textStyle,
+    double progress,
     this.fadeInProgress,
     this.fadeOutProgress,
-    this.progress,
     this.yDisplace,
-  })  : assert(text != null),
-        assert(fadeInProgress != null),
-        assert(fadeOutProgress != null),
-        assert(textStyle != null);
+  }) : super(text, textStyle, progress);
 
-  final String text;
-
-  final TextStyle textStyle;
-  final double fadeInProgress, fadeOutProgress, progress, yDisplace;
-
-  List<_TextInfo> _textInfo = [];
-  List<_TextInfo> _oldTextInfo = [];
-
-  String _oldText;
+  final double fadeInProgress, fadeOutProgress, yDisplace;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    double percent = progress;
-    // calculate text info for 1st time
-    if (_textInfo.length == 0) {
-      calculateTextInfo(text, _textInfo);
-    }
-
-    canvas.save();
-
-    if (_oldTextInfo != null && _oldTextInfo.length > 0) {
-      for (_TextInfo _oldTextLayoutInfo in _oldTextInfo) {
-        if (_oldTextLayoutInfo.isMoving) {
-          final changeInX =
-              (_oldTextLayoutInfo.offsetX - _oldTextLayoutInfo.toX) * percent;
-          drawText(
-            canvas,
-            _oldTextLayoutInfo.text,
-            0,
-            1,
-            Offset(
-              _oldTextLayoutInfo.offsetX - changeInX,
-              _oldTextLayoutInfo.offsetY,
-            ),
-            _oldTextLayoutInfo,
-          );
-        } else {
-          drawText(
-            canvas,
-            _oldTextLayoutInfo.text,
-            -percent,
-            fadeOutProgress,
-            Offset(
-              _oldTextLayoutInfo.offsetX,
-              _oldTextLayoutInfo.offsetY,
-            ),
-            _oldTextLayoutInfo,
-          );
-        }
-      }
-    } else {
-      //no oldText
-      percent = 1;
-    }
-    for (_TextInfo _textLayoutInfo in _textInfo) {
-      if (!_textLayoutInfo.isMoving) {
-        drawText(
-          canvas,
-          _textLayoutInfo.text,
-          1 - percent,
-          fadeInProgress,
-          Offset(
-            _textLayoutInfo.offsetX,
-            _textLayoutInfo.offsetY,
-          ),
-          _textLayoutInfo,
-        );
-      }
-    }
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(_WTextPainter oldDelegate) {
-    String oldFrameText = oldDelegate.text;
-    if (oldFrameText == text) {
-      this._oldText = oldDelegate._oldText;
-      this._oldTextInfo = oldDelegate._oldTextInfo;
-      this._textInfo = oldDelegate._textInfo;
-      // shouldn't repaint if there is not change in progress
-      if (this.progress == oldDelegate.progress) {
-        return false;
-      }
-    } else {
-      this._oldText = oldDelegate.text;
-      // calculate text info for prev and current text
-      calculateTextInfo(text, _textInfo);
-      calculateTextInfo(_oldText, _oldTextInfo);
-      // calculate which text will move to which position
-      calculateMove();
-    }
-    return true;
-  }
-
-  void drawText(
-    Canvas canvas,
-    String text,
-    double yOffset,
-    double alphaFactor,
-    Offset offset,
-    _TextInfo textInfo,
-  ) {
-    final textPaint = Paint();
-    if (alphaFactor == 1) {
-      textPaint.color = textStyle.color;
-    } else {
-      textPaint.color = textStyle.color.withAlpha(
-        (textStyle.color.alpha * alphaFactor).floor(),
-      );
-    }
-
-    final textPainter = TextPainter(
-      text: TextSpan(
-          text: text,
-          style: textStyle.merge(
-            TextStyle(
-              color: textPaint.color,
-            ),
-          )),
-    )
-      ..textDirection = TextDirection.ltr
-      ..textAlign = TextAlign.center
-      ..textDirection = TextDirection.ltr
-      ..layout();
-
-    final yMove = yDisplace * textInfo.height * yOffset;
-
-    textPainter.paint(
-      canvas,
-      Offset(
-        offset.dx,
-        (offset.dy + (textInfo.height - textPainter.height) / 2) + yMove,
-      ),
+  TextProperties incomingText(TextProperties textProperties) {
+    return textProperties.copyWith(
+      offsetY: yDisplace * textProperties.height * (1 - progress),
+      opacity: fadeInProgress,
     );
   }
 
-  void calculateTextInfo(String text, List<_TextInfo> list) {
-    list.clear();
-
-    TextPainter textPainter = TextPainter(
-      text: TextSpan(text: text, style: textStyle),
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-      textAlign: TextAlign.center,
-    )..layout();
-
-    // spliting the text and storing thier infomation for each
-    for (int i = 0; i < text.length; i++) {
-      var forCaret =
-          textPainter.getOffsetForCaret(TextPosition(offset: i), Rect.zero);
-
-      var textLayoutInfo = _TextInfo()
-        ..text = text[i]
-        ..offsetX = forCaret.dx - textPainter.width / 2
-        ..offsetY = forCaret.dy
-        ..width = 0
-        ..height = textPainter.height;
-
-      list.add(textLayoutInfo);
-    }
+  @override
+  TextProperties outgoingText(TextProperties textProperties) {
+    return textProperties.copyWith(
+      offsetY: -(yDisplace * textProperties.height * (progress)),
+      opacity: fadeOutProgress,
+    );
   }
-
-  void calculateMove() {
-    if (_oldTextInfo == null || _oldTextInfo.length == 0) {
-      return;
-    }
-    if (_textInfo == null || _textInfo.length == 0) {
-      return;
-    }
-
-    for (_TextInfo oldText in _oldTextInfo) {
-      for (_TextInfo text in _textInfo) {
-        if (!text.isMoving && !oldText.isMoving && text.text == oldText.text) {
-          oldText.toX = text.offsetX;
-          text.isMoving = true;
-          oldText.isMoving = true;
-        }
-      }
-    }
-  }
-}
-
-class _TextInfo {
-  String text;
-  double offsetX;
-  double offsetY;
-  double width;
-  double height;
-  double toX = 0;
-  bool isMoving = false;
 }
