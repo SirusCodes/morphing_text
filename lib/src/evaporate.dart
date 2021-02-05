@@ -136,7 +136,7 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
       animation: _controller,
       builder: (BuildContext context, Widget child) {
         return CustomMorphingText(
-          morphingText: Evaporate(
+          morphingText: CustomEvaporateMorphingText(
             text: texts[index],
             textStyle:
                 DefaultTextStyle.of(context).style.merge(widget.textStyle),
@@ -181,8 +181,8 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
   }
 }
 
-class Evaporate extends CustomMorphingPainter {
-  Evaporate({
+class CustomEvaporateMorphingText extends CustomMorphingPainter {
+  CustomEvaporateMorphingText({
     String text,
     TextStyle textStyle,
     double progress,

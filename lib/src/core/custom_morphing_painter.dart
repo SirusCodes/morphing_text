@@ -110,6 +110,7 @@ abstract class CustomMorphingPainter extends CustomPainter {
     )
       ..textDirection = TextDirection.ltr
       ..textAlign = TextAlign.center
+      ..textScaleFactor = textProperties.scale
       ..textDirection = TextDirection.ltr
       ..layout();
 
@@ -117,7 +118,7 @@ abstract class CustomMorphingPainter extends CustomPainter {
       canvas,
       Offset(
         textProperties.offsetX,
-        textProperties.offsetY,
+        textProperties.offsetY - textPainter.height / 2,
       ),
     );
   }
@@ -191,7 +192,9 @@ class TextProperties {
   double height;
   double toX;
   double opacity;
+  double scale;
   bool _isMoving = false;
+
   TextProperties({
     this.text,
     this.offsetX = 0,
@@ -200,6 +203,7 @@ class TextProperties {
     this.height,
     this.toX = 0,
     this.opacity = 1,
+    this.scale = 1,
   });
 
   TextProperties copyWith({
@@ -210,7 +214,7 @@ class TextProperties {
     double height,
     double toX,
     double opacity,
-    bool isMoving,
+    double scale,
   }) {
     return TextProperties(
       text: text ?? this.text,
@@ -220,6 +224,7 @@ class TextProperties {
       height: height ?? this.height,
       toX: toX ?? this.toX,
       opacity: opacity ?? this.opacity,
+      scale: scale ?? this.scale,
     );
   }
 
