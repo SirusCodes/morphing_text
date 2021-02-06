@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'core/custom_morphing_painter.dart';
+import 'core/custom_morphing_text.dart';
 
 class ScaleMorphingText extends StatefulWidget {
   /// List of [String] which will show the texts
@@ -175,7 +175,7 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
   }
 }
 
-class CustomScaleMorphingText extends CustomMorphingPainter {
+class CustomScaleMorphingText extends MorphingText {
   CustomScaleMorphingText(
     String text,
     TextStyle textStyle,
@@ -184,7 +184,11 @@ class CustomScaleMorphingText extends CustomMorphingPainter {
     this.fadeOutProgress,
   }) : super(text, textStyle, progress);
 
-  final double fadeInProgress, fadeOutProgress;
+  /// Opacity of text which will come next
+  final double fadeInProgress;
+
+  /// Opacity of text which is going out
+  final double fadeOutProgress;
 
   @override
   TextProperties incomingText(TextProperties textProperties) {

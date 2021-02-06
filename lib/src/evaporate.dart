@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'core/custom_morphing_painter.dart';
+import 'core/custom_morphing_text.dart';
 
 class EvaporateMorphingText extends StatefulWidget {
   /// List of [String] which will show the texts
@@ -181,7 +181,7 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
   }
 }
 
-class CustomEvaporateMorphingText extends CustomMorphingPainter {
+class CustomEvaporateMorphingText extends MorphingText {
   CustomEvaporateMorphingText({
     String text,
     TextStyle textStyle,
@@ -191,7 +191,14 @@ class CustomEvaporateMorphingText extends CustomMorphingPainter {
     this.yDisplace,
   }) : super(text, textStyle, progress);
 
-  final double fadeInProgress, fadeOutProgress, yDisplace;
+  /// Opacity of text which will come next
+  final double fadeInProgress;
+
+  /// Opacity of text which is going out
+  final double fadeOutProgress;
+
+  /// Displacement of text in y-axis
+  final double yDisplace;
 
   @override
   TextProperties incomingText(TextProperties textProperties) {

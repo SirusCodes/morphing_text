@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 class CustomMorphingText extends StatelessWidget {
   const CustomMorphingText({Key key, @required this.morphingText})
       : assert(
-          morphingText is CustomMorphingPainter,
+          morphingText is MorphingText,
           "Provider a CustomMorphingText",
         ),
         super(key: key);
 
-  final CustomMorphingPainter morphingText;
+  final MorphingText morphingText;
 
   @override
   Widget build(BuildContext context) {
@@ -20,17 +20,25 @@ class CustomMorphingText extends StatelessWidget {
   }
 }
 
-abstract class CustomMorphingPainter extends CustomPainter {
-  CustomMorphingPainter(
+abstract class MorphingText extends CustomPainter {
+  MorphingText(
     this.text,
     this.textStyle,
     this.progress,
   )   : assert(text != null),
         assert(textStyle != null),
-        assert(progress != null);
+        assert(progress != null),
+        assert(progress >= 0 && progress <= 1, "Should be between 0 and 1");
 
+  /// Text which will be visible on the screen
   final String text;
+
+  /// TextStyle of Text
   final TextStyle textStyle;
+
+  /// Progress of animation
+  ///
+  /// Should be between 0 and 1
   final double progress;
 
   List<TextProperties> _textProperties = [];
@@ -67,7 +75,7 @@ abstract class CustomMorphingPainter extends CustomPainter {
 
   @override
   @mustCallSuper
-  bool shouldRepaint(CustomMorphingPainter oldDelegate) {
+  bool shouldRepaint(MorphingText oldDelegate) {
     String oldFrameText = oldDelegate.text;
     if (oldFrameText == text) {
       this._oldText = oldDelegate._oldText;
@@ -138,14 +146,14 @@ abstract class CustomMorphingPainter extends CustomPainter {
       var forCaret =
           textPainter.getOffsetForCaret(TextPosition(offset: i), Rect.zero);
 
-      var textLayoutInfo = TextProperties()
+      var textProperties = TextProperties()
         ..text = text[i]
         ..offsetX = forCaret.dx - textPainter.width / 2
         ..offsetY = forCaret.dy
         ..width = 0
         ..height = textPainter.height;
 
-      list.add(textLayoutInfo);
+      list.add(textProperties);
     }
   }
 
@@ -170,6 +178,10 @@ abstract class CustomMorphingPainter extends CustomPainter {
     }
   }
 
+  /// The motion on text which is same in current and next text
+  /// in list
+  ///
+  /// Should return a [TextProperties]
   TextProperties morphingText(TextProperties textProperties) {
     return textProperties.copyWith(
       offsetY: 0,
@@ -179,8 +191,12 @@ abstract class CustomMorphingPainter extends CustomPainter {
     );
   }
 
+  /// Should return [TextProperties] of text which is coming
+  /// next on screen
   TextProperties incomingText(TextProperties textProperties);
 
+  /// Should return [TextProperties] of text which is going out
+  /// from screen
   TextProperties outgoingText(TextProperties textProperties);
 }
 
