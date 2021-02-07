@@ -1,3 +1,8 @@
+## [1.0.0-nullsafety.1] - API improvements
+
+- Made `MorphingText` and `CustomMorphingText` class for making custom animations
+- Using `CustomFooMorphingText` for making animations
+
 ## [1.0.0-nullsafety.0] - Null Safety added
 
 - Null Safety added

@@ -1,6 +1,6 @@
 name: morphing_text
 description: Text animations inspired by https://github.com/lexrus/LTMorphingLabel
-version: 1.0.0-nullsafety.0
+version: 1.0.0-nullsafety.1
 homepage: https://github.com/SirusCodes/morphing_text/
 repository: https://github.com/SirusCodes/morphing_text/
 

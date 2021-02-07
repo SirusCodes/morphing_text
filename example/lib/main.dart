@@ -30,15 +30,15 @@ class _MyHomePageState extends State<MyHomePage> {
   static const List<String> text = [
     "Design",
     "Design is not just",
-    "what it looks like",
-    "and feels like.",
-    "Design",
-    "Design is how it works.",
-    "- Steve Jobs",
+    // "what it looks like",
+    // "and feels like.",
+    // "Design",
+    // "Design is how it works.",
+    // "- Steve Jobs",
   ];
 
   List<Widget> animations = [
-    ScaleMorphingText(
+    EvaporateMorphingText(
       texts: text,
       loopForever: true,
       onComplete: () {
@@ -46,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
       },
       textStyle: TextStyle(fontSize: 30.0),
     ),
-    EvaporateMorphingText(
+    ScaleMorphingText(
       texts: text,
       loopForever: true,
       onComplete: () {
