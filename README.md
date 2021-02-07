@@ -14,11 +14,11 @@
    <a href="https://github.com/SirusCodes/morphing_text">
    <img src="https://img.shields.io/github/stars/SirusCodes/morphing_text" >
    </a>
-</div> 
+</div>
 
 # Morphing Text
 
-It is a collection of text animations inspired by [LTMorphingLabel](https://github.com/lexrus/LTMorphingLabel). 
+It is a collection of text animations inspired by [LTMorphingLabel](https://github.com/lexrus/LTMorphingLabel).
 
 ## Animations
 
@@ -66,22 +66,55 @@ EvaporateMorphingText(
 
 > Changing Curves is purely experimental, select proper curves as per your need or leave them at default
 
-## Installation
-Add in your pubspec.yaml
-```yaml
-dependencies:
-  morphing_text: <latest>
-```
+## Making custom animations
 
-install packages
-```console
-flutter packages get
-```
+1. To make custom animations extend your class with `MorphingText`
 
-Then import it in your main
 ```dart
-import 'package: morphing_text/morphing_text.dart';
+class CustomFooMorphingText extends MorphingText {
+  ...
+}
 ```
+2. Override `incomingText` and `outgoingText` methods to animate entry of next and exit of previous text respectively and pass `text`, `textStyle` and `progress` to super.
+
+```dart
+class CustomFooMorphingText extends MorphingText {
+  CustomFooMorphingText(
+      String text,
+      TextStyle textStyle,
+      double progress,
+  ) : super(text, textStyle, progress);
+
+  @override
+  TextProperties morphingText(TextProperties textProperties) {
+    // Optional to change the motion of moving text
+  }
+
+  @override
+  TextProperties incomingText(TextProperties textProperties) {
+    // Write you logic for next text
+  }
+
+  @override
+  TextProperties outgoingText(TextProperties textProperties) {
+    // Write you logic for leaving text
+  }
+}
+```
+
+3. Pass your custom animation to `CustomMorphingText` in build method.
+
+```dart
+CustomMorphingText(
+  morphingText: CustomFooMorphingText(
+    texts[index],
+    DefaultTextStyle.of(context).style.merge(widget.textStyle),
+    _progress.value,
+  ),
+);
+```
+
+4. For example you can see implementation of `CustomScaleMorphingText` on [github](https://github.com/SirusCodes/morphing_text/blob/master/lib/src/scale.dart#L178)
 
 ## Want to Contribute?
 A help is always welcomed, check our [CONTRIBUTING.md](https://github.com/SirusCodes/morphing_text/blob/master/CONTRIBUTING.md)

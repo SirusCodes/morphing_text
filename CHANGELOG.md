@@ -1,3 +1,8 @@
+## [0.3.0] - API improvements
+
+- Made `MorphingText` and `CustomMorphingText` class for making custom animations
+- Using `CustomFooMorphingText` for making animations
+
 ## [0.2.1+1] - Documentation updated
 
 - Documentation updated
