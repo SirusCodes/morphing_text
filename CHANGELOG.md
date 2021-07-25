@@ -1,3 +1,7 @@
+## [1.0.1] - Fix RangeError
+
+- Fix `RangeError` if `loopForever` is false
+
 ## [1.0.0-nullsafety.1] - API improvements
 
 - Made `MorphingText` and `CustomMorphingText` class for making custom animations

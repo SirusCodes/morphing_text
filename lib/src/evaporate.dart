@@ -94,6 +94,8 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
 
   @override
   void initState() {
+    super.initState();
+
     // Setting up controller and animation
     _controller = AnimationController(
       vsync: this,
@@ -112,8 +114,6 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
     texts = widget.texts;
     length = texts.length;
     count = widget.loopCount;
-
-    super.initState();
 
     // Calling _nextText to start animation
     _nextText();
@@ -155,7 +155,7 @@ class _EvaporateMorphingTextState extends State<EvaporateMorphingText>
   }
 
   void _nextText() {
-    final bool isLast = index % length == length - 1;
+    final bool isLast = index >= length - 1;
 
     // loopForever is [false] and  we are a last index
     if (!widget.loopForever && isLast) {

@@ -88,6 +88,8 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
 
   @override
   void initState() {
+    super.initState();
+
     // Setting up controller and animation
     _controller = AnimationController(
       vsync: this,
@@ -107,8 +109,6 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
     texts = widget.texts;
     length = texts.length;
     count = widget.loopCount;
-
-    super.initState();
 
     // Calling _nextText to start animation
     _nextText();
@@ -148,7 +148,7 @@ class _ScaleMorphingTextState extends State<ScaleMorphingText>
   }
 
   Future<void> _nextText() async {
-    final bool isLast = index % length == length - 1;
+    final bool isLast = index == length - 1;
 
     // loopForever is [false] and  we are a last index
     if (!widget.loopForever && isLast) {
